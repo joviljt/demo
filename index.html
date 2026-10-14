@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f5ef">
+  <title>Inbox Investigator | Cybersecurity Challenge</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+    :root {
+      color-scheme: light;
+      --paper: #f3f5ef;
+      --white: #fffefa;
+      --ink: #1e2926;
+      --muted: #74817a;
+      --line: #dce2d8;
+      --green: #246b4b;
+      --green-soft: #e5f2e8;
+      --red: #bb4939;
+      --red-soft: #fbe9e4;
+      --yellow: #e7b64c;
+      --shadow: 0 14px 42px rgba(36, 54, 43, .08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: radial-gradient(#d8ded4 0.7px, transparent 0.7px);
+      background-size: 17px 17px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid #e7b64c; outline-offset: 3px; }
+    .app { width: min(1160px, calc(100% - 40px)); margin: 0 auto; padding: 25px 0 44px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 24px; }
+    .brand { display: flex; gap: 11px; align-items: center; }
+    .brand-mark { display: grid; width: 42px; height: 42px; place-items: center; color: white; background: var(--green); border-radius: 12px; }
+    .brand-mark svg { width: 23px; height: 23px; }
+    .brand-name { font: 700 17px 'Space Grotesk', sans-serif; letter-spacing: 0; }
+    .brand-sub { margin-top: 2px; color: var(--muted); font: 11px 'DM Mono', monospace; letter-spacing: 0; }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .level-tag, .score-pill { display: flex; align-items: center; min-height: 38px; padding: 0 13px; border: 1px solid var(--line); border-radius: 999px; background: var(--white); font-size: 12px; font-weight: 700; }
+    .score-pill { gap: 7px; color: var(--green); border-color: #c8dfcc; background: var(--green-soft); }
+    .score-pill svg { width: 15px; height: 15px; }
+    .hero { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin: 0 2px 20px; }
+    .eyebrow { color: var(--green); font: 500 11px 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+    h1 { margin: 7px 0 5px; font: 700 clamp(28px, 4vw, 40px)/1.08 'Space Grotesk', sans-serif; letter-spacing: 0; }
+    .intro { max-width: 540px; margin: 0; color: #5e6a63; font-size: 14px; line-height: 1.55; }
+    .progress-wrap { width: min(330px, 39%); padding-bottom: 4px; }
+    .progress-label { display: flex; justify-content: space-between; margin-bottom: 9px; color: var(--muted); font: 11px 'DM Mono', monospace; }
+    .progress-track { height: 7px; overflow: hidden; border-radius: 20px; background: #dce2d8; }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: var(--green); transition: width .45s ease; }
+
+    .workspace { display: grid; grid-template-columns: 235px minmax(0, 1fr); min-height: 570px; overflow: hidden; border: 1px solid #d8ded5; border-radius: 14px; background: var(--white); box-shadow: var(--shadow); animation: arrive .45s ease-out both; }
+    .sidebar { padding: 20px 13px; background: #f8f9f5; border-right: 1px solid var(--line); }
+    .side-label { padding: 0 11px 10px; color: #929b94; font: 11px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .06em; }
+    .mailbox { display: flex; align-items: center; gap: 11px; min-height: 43px; padding: 0 11px; border-radius: 8px; color: #58655d; font-size: 13px; }
+    .mailbox.active { color: var(--green); background: #e6f0e7; font-weight: 700; }
+    .mailbox svg { width: 17px; height: 17px; flex: none; }
+    .mailbox .count { margin-left: auto; color: #849087; font: 11px 'DM Mono', monospace; }
+    .briefing { margin: 28px 6px 0; padding: 14px 13px; border: 1px solid #e1e6dd; border-radius: 9px; background: white; }
+    .briefing-title { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; }
+    .briefing-title svg { width: 15px; color: var(--yellow); }
+    .briefing p { margin: 8px 0 0; color: #737f77; font-size: 11px; line-height: 1.5; }
+    .main-panel { min-width: 0; padding: 22px 25px 24px; }
+    .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid #e9ece6; }
+    .panel-heading h2 { margin: 0; font: 700 16px 'Space Grotesk', sans-serif; letter-spacing: 0; }
+    .panel-heading span { color: var(--muted); font: 11px 'DM Mono', monospace; }
+    .email-card { margin-top: 19px; border: 1px solid #e0e5dd; border-radius: 10px; background: white; overflow: hidden; }
+    .email-top { display: flex; align-items: flex-start; gap: 12px; padding: 19px 19px 14px; }
+    .avatar { display: grid; width: 39px; height: 39px; flex: none; place-items: center; border-radius: 50%; color: #476551; background: #e8eee3; font: 700 13px 'Space Grotesk', sans-serif; }
+    .sender-block { min-width: 0; flex: 1; }
+    .sender-name { font-size: 13px; font-weight: 700; }
+    .sender-address { margin-top: 3px; color: #78847c; font: 11px 'DM Mono', monospace; overflow-wrap: anywhere; }
+    .recipient { margin-top: 6px; color: #a0a8a0; font-size: 11px; }
+    .email-date { padding-top: 2px; color: #929b94; font: 10px 'DM Mono', monospace; white-space: nowrap; }
+    .subject { margin: 0; padding: 0 19px 16px 70px; font: 700 18px/1.3 'Space Grotesk', sans-serif; letter-spacing: 0; }
+    .email-body { min-height: 145px; padding: 17px 20px 19px; border-top: 1px solid #edf0eb; color: #47544c; font-size: 13px; line-height: 1.72; white-space: pre-line; }
+    .email-body a { color: #2874a5; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+    .email-footer { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 10px 19px; border-top: 1px solid #edf0eb; color: #8b968d; font: 10px 'DM Mono', monospace; }
+    .decision-label { margin: 21px 0 10px; color: #627067; font-size: 12px; font-weight: 700; }
+    .decision-row { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .decision { display: flex; align-items: center; justify-content: center; gap: 9px; min-height: 47px; border: 1px solid #d9e0d7; border-radius: 8px; background: white; color: #35433a; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform .15s, border-color .15s, background .15s; }
+    .decision:hover:not(:disabled) { transform: translateY(-1px); border-color: #aab9ac; background: #fbfcf9; }
+    .decision svg { width: 17px; height: 17px; }
+    .decision.report svg { color: var(--red); }
+    .decision.safe svg { color: var(--green); }
+    .decision:disabled { cursor: default; opacity: .58; }
+    .feedback { display: none; margin-top: 14px; padding: 15px 16px; border: 1px solid; border-radius: 8px; animation: arrive .25s ease-out both; }
+    .feedback.show { display: block; }
+    .feedback.correct { border-color: #c9e0cc; background: #eef7ee; }
+    .feedback.incorrect { border-color: #f0d2c9; background: #fff1ec; }
+    .feedback-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; }
+    .feedback.correct .feedback-title { color: #286244; }
+    .feedback.incorrect .feedback-title { color: #9f4033; }
+    .feedback-title svg { width: 17px; height: 17px; }
+    .feedback p { margin: 7px 0 0; color: #526058; font-size: 12px; line-height: 1.55; }
+    .continue-row { display: flex; justify-content: flex-end; margin-top: 12px; }
+    .continue-btn, .restart-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 17px; border: 0; border-radius: 7px; background: var(--green); color: white; font-size: 12px; font-weight: 700; cursor: pointer; transition: background .15s, transform .15s; }
+    .continue-btn:hover, .restart-btn:hover { background: #1d593e; transform: translateY(-1px); }
+    .continue-btn svg, .restart-btn svg { width: 15px; height: 15px; }
+    .completion { display: none; padding: 56px 20px 45px; text-align: center; }
+    .completion.show { display: block; animation: arrive .35s ease-out both; }
+    .completion-mark { display: grid; width: 66px; height: 66px; margin: 0 auto 20px; place-items: center; border: 1px solid #c8dfcc; border-radius: 50%; background: var(--green-soft); color: var(--green); }
+    .completion-mark svg { width: 30px; height: 30px; }
+    .completion h2 { margin: 0; font: 700 27px 'Space Grotesk', sans-serif; letter-spacing: 0; }
+    .completion p { max-width: 440px; margin: 11px auto 21px; color: #647068; font-size: 14px; line-height: 1.6; }
+    .final-score { margin-bottom: 20px; color: var(--green); font: 700 19px 'Space Grotesk', sans-serif; }
+    .footer-note { margin-top: 14px; color: #849087; text-align: center; font: 10px 'DM Mono', monospace; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 720px) {
+      .app { width: min(100% - 24px, 560px); padding-top: 15px; }
+      .topbar { margin-bottom: 21px; }
+      .brand-sub { display: none; }
+      .level-tag { display: none; }
+      .hero { display: block; }
+      .progress-wrap { width: 100%; margin-top: 18px; }
+      .workspace { display: block; min-height: 0; }
+      .sidebar { display: flex; align-items: center; gap: 4px; padding: 9px 11px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      .side-label, .briefing { display: none; }
+      .mailbox { flex: none; min-height: 37px; padding: 0 10px; font-size: 11px; }
+      .mailbox .count { display: none; }
+      .mailbox svg { width: 15px; }
+      .main-panel { padding: 16px 14px 18px; }
+      .email-top { padding: 15px 14px 11px; }
+      .subject { padding: 0 14px 14px; font-size: 16px; }
+      .email-body { min-height: 135px; padding: 15px; font-size: 12px; }
+      .email-footer { padding: 9px 14px; }
+      .email-date { font-size: 9px; }
+      .decision-row { gap: 8px; }
+      .decision { min-height: 45px; font-size: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand" aria-label="Inbox Investigator">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v13H4z"/><path d="m4.5 7 7.5 6 7.5-6"/><circle cx="18.5" cy="17.5" r="3.2" fill="#246b4b"/><path d="m17.2 17.5 1 1 1.8-2" stroke="#fffefa"/></svg>
+        </div>
+        <div><div class="brand-name">Inbox Investigator</div><div class="brand-sub">DIGITAL SAFETY LAB</div></div>
+      </div>
+      <div class="top-actions"><div class="level-tag">STUDENT CHALLENGE</div><div class="score-pill" aria-live="polite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg><span id="score">0 pts</span></div></div>
+    </header>
+
+    <section class="hero" aria-labelledby="game-title">
+      <div><div class="eyebrow">FIELD EXERCISE 01 / EMAIL TRIAGE</div><h1 id="game-title">Trust your instincts.<br>Then check the evidence.</h1><p class="intro">Your inbox has new mail. Inspect each message and decide: phishing attempt, or safe to open?</p></div>
+      <div class="progress-wrap"><div class="progress-label"><span>INVESTIGATION PROGRESS</span><span id="progress-text">01 / 05</span></div><div class="progress-track" role="progressbar" aria-label="Investigation progress" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"><div class="progress-fill" id="progress-fill"></div></div></div>
+    </section>
+
+    <section class="workspace" aria-label="Email investigation workspace">
+      <aside class="sidebar" aria-label="Mail folders">
+        <div class="side-label">MAILBOX</div>
+        <div class="mailbox active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.5h16v13H4z"/><path d="m4.5 7 7.5 6 7.5-6"/></svg>Inbox <span class="count" id="inbox-count">05</span></div>
+        <div class="mailbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M5 17v3h14v-3"/></svg>Quarantine</div>
+        <div class="mailbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.5h16v13H4z"/><path d="m4.5 7 7.5 6 7.5-6"/><path d="m8 4 8 16"/></svg>Trash</div>
+        <div class="briefing"><div class="briefing-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 3.5 7v5c0 5 3.6 8 8.5 9 4.9-1 8.5-4 8.5-9V7z"/><path d="m9 12 2 2 4-4"/></svg>Investigator tip</div><p>Look closely at the sender address, links, urgency, and what the message asks you to do.</p></div>
+      </aside>
+
+      <div class="main-panel">
+        <div id="game-view">
+          <div class="panel-heading"><h2>Incoming message</h2><span id="mail-index">MESSAGE 01 OF 05</span></div>
+          <article class="email-card" aria-label="Email to investigate">
+            <div class="email-top"><div class="avatar" id="sender-avatar">IT</div><div class="sender-block"><div class="sender-name" id="sender-name"></div><div class="sender-address" id="sender-address"></div><div class="recipient">to: you</div></div><div class="email-date" id="email-date"></div></div>
+            <h3 class="subject" id="email-subject"></h3><div class="email-body" id="email-body"></div><div class="email-footer"><span id="email-category">INBOX / GENERAL</span><span id="email-size"></span></div>
+          </article>
+          <p class="decision-label" id="decision-label">What would you do with this email?</p>
+          <div class="decision-row" role="group" aria-labelledby="decision-label">
+            <button class="decision report" id="report-button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V5m0 0c5-4 9 4 14 0v11c-5 4-9-4-14 0"/></svg>Report phishing</button>
+            <button class="decision safe" id="safe-button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3.5 7v5c0 5 3.6 8 8.5 9 4.9-1 8.5-4 8.5-9V7z"/><path d="m9 12 2 2 4-4"/></svg>Looks legitimate</button>
+          </div>
+          <div class="feedback" id="feedback" aria-live="polite"></div>
+        </div>
+        <div class="completion" id="completion" aria-live="polite"></div>
+      </div>
+    </section>
+    <div class="footer-note">SIMULATED MESSAGES FOR LEARNING · NEVER CLICK A LINK YOU DO NOT TRUST</div>
+  </main>
+
+  <script>
+    const messages = [
+      {
+        sender: 'Campus IT Help Desk', address: 'support@campus-it.help', initials: 'IT', date: '9:14 AM',
+        subject: 'Action required: mailbox storage exceeded',
+        body: 'Your student mailbox is over its storage limit. Messages may stop arriving today.\n\nRestore access now: <a href="#" tabindex="-1" aria-label="simulated suspicious link">campus-mailbox-review.com</a>\n\nYou have 30 minutes before your account is paused.',
+        category: 'ACCOUNT NOTICE', size: '18 KB', phishing: true,
+        explanation: 'The sender domain does not match the school, the link leads to an unrelated site, and the short deadline pressures you to act. Go to your school’s IT website directly instead of using the link.'
+      },
+      {
+        sender: 'Ms. Rivera · Biology', address: 'mrivera@northview.edu', initials: 'MR', date: 'Yesterday',
+        subject: 'Lab groups and Friday’s field study',
+        body: 'Hi everyone,\n\nI have posted the lab groups and the field study checklist in our usual class folder. Please bring a notebook and meet outside Room 214 at 9:00 on Friday.\n\nSee you then,\nMs. Rivera',
+        category: 'SCHOOL / BIOLOGY', size: '24 KB', phishing: false,
+        explanation: 'This matches a known teacher address and refers to a familiar class activity without asking for passwords, money, or urgent account changes. Still, check unexpected attachments or links before opening them.'
+      },
+      {
+        sender: 'Northview Student Services', address: 'financial-aid@northviev.edu', initials: 'SS', date: '8:02 AM',
+        subject: 'Your student grant is waiting!',
+        body: 'Congratulations! You have been selected for a $1,250 student grant.\n\nConfirm your details today to receive the funds: <a href="#" tabindex="-1" aria-label="simulated suspicious link">northview-awards.net/claim</a>\n\nReply with your student ID and date of birth if you have questions.',
+        category: 'STUDENT SERVICES', size: '21 KB', phishing: true,
+        explanation: 'The sender misspells the school domain (“northviev”), offers unexpected money, and asks for personal information. Verify grants through the official student-services office using contact details you already know.'
+      },
+      {
+        sender: 'Library Notifications', address: 'notices@library.northview.edu', initials: 'LN', date: 'Mon, 10:32 AM',
+        subject: 'Reminder: book due tomorrow',
+        body: 'Hello,\n\nA book checked out on your library account is due tomorrow. You can renew it or check its status by visiting the library website and signing in as usual.\n\nLibrary Services\nNorthview School',
+        category: 'SCHOOL / LIBRARY', size: '16 KB', phishing: false,
+        explanation: 'This comes from a school subdomain and gives a routine reminder without demanding credentials by reply or pushing an unusual link. When in doubt, navigate to the library site yourself.'
+      },
+      {
+        sender: 'Northview Password Team', address: 'security@northview-passwords.com', initials: 'NP', date: '7:48 AM',
+        subject: 'Final warning: password expires in 10 minutes',
+        body: 'We detected suspicious activity. Your account will be permanently deleted unless you verify your password immediately.\n\nSecure account: <a href="#" tabindex="-1" aria-label="simulated suspicious link">northview-passwords.com/verify</a>\n\nDo not contact the school office; this automated security check cannot be delayed.',
+        category: 'SECURITY ALERT', size: '19 KB', phishing: true,
+        explanation: 'The domain is not the school’s, the message threatens account deletion, and it explicitly tells you not to verify with staff. Real security teams do not need your password through an email link. Report it and contact IT through an official channel.'
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let correctCount = 0;
+    const scoreElement = document.getElementById('score');
+    const fill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    const progressBar = document.querySelector('[role="progressbar"]');
+    const feedback = document.getElementById('feedback');
+    const reportButton = document.getElementById('report-button');
+    const safeButton = document.getElementById('safe-button');
+
+    function loadMessage() {
+      const message = messages[current];
+      document.getElementById('sender-avatar').textContent = message.initials;
+      document.getElementById('sender-name').textContent = message.sender;
+      document.getElementById('sender-address').textContent = message.address;
+      document.getElementById('email-date').textContent = message.date;
+      document.getElementById('email-subject').textContent = message.subject;
+      document.getElementById('email-body').innerHTML = message.body;
+      document.getElementById('email-category').textContent = message.category;
+      document.getElementById('email-size').textContent = message.size;
+      document.getElementById('mail-index').textContent = `MESSAGE ${String(current + 1).padStart(2, '0')} OF ${String(messages.length).padStart(2, '0')}`;
+      document.getElementById('inbox-count').textContent = String(messages.length - current).padStart(2, '0');
+      reportButton.disabled = false;
+      safeButton.disabled = false;
+      feedback.className = 'feedback';
+      feedback.innerHTML = '';
+      document.getElementById('decision-label').focus?.();
+    }
+
+    function decide(reported) {
+      const message = messages[current];
+      const correct = reported === message.phishing;
+      if (correct) {
+        score += 100;
+        correctCount += 1;
+      }
+      scoreElement.textContent = `${score} pts`;
+      reportButton.disabled = true;
+      safeButton.disabled = true;
+      feedback.className = `feedback show ${correct ? 'correct' : 'incorrect'}`;
+      feedback.innerHTML = `<div class="feedback-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${correct ? '<path d="m5 12 4 4L19 6"/>' : '<path d="M12 8v5m0 4h.01"/><circle cx="12" cy="12" r="9"/>'}</svg>${correct ? 'Good catch. +100 points' : `Not quite. This was ${message.phishing ? 'a phishing attempt' : 'a legitimate message'}.`}</div><p>${message.explanation}</p><div class="continue-row"><button class="continue-btn" id="continue-button">${current === messages.length - 1 ? 'See results' : 'Next email'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button></div>`;
+      const progress = current + 1;
+      fill.style.width = `${(progress / messages.length) * 100}%`;
+      progressText.textContent = `${String(progress).padStart(2, '0')} / ${String(messages.length).padStart(2, '0')}`;
+      progressBar.setAttribute('aria-valuenow', String(progress));
+      document.getElementById('continue-button').addEventListener('click', nextMessage);
+      document.getElementById('continue-button').focus();
+    }
+
+    function nextMessage() {
+      current += 1;
+      if (current >= messages.length) {
+        showResults();
+        return;
+      }
+      loadMessage();
+      document.getElementById('email-subject').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function showResults() {
+      document.getElementById('game-view').hidden = true;
+      const completion = document.getElementById('completion');
+      const percentage = Math.round((correctCount / messages.length) * 100);
+      let message = percentage === 100
+        ? 'You spotted every message correctly. Keep checking the sender, the link destination, and the pressure tactics before you act.'
+        : percentage >= 60
+          ? 'A solid investigation. Slow down around unexpected links, urgent deadlines, and requests for personal information.'
+          : 'Every suspicious message is a chance to learn. Verify through a separate, trusted channel before clicking, replying, or sharing information.';
+      completion.innerHTML = `<div class="completion-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3.5 7v5c0 5 3.6 8 8.5 9 4.9-1 8.5-4 8.5-9V7z"/><path d="m9 12 2 2 4-4"/></svg></div><h2>Investigation complete</h2><p>${message}</p><div class="final-score">${correctCount} of ${messages.length} correct · ${score} points</div><button class="restart-btn" id="restart-button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9a7 7 0 0 1 11.8-2L20 12M4 12l2.6 5a7 7 0 0 0 11.8-2"/></svg>Play again</button>`;
+      completion.classList.add('show');
+      document.getElementById('restart-button').addEventListener('click', restartGame);
+      document.getElementById('restart-button').focus();
+    }
+
+    function restartGame() {
+      current = 0;
+      score = 0;
+      correctCount = 0;
+      scoreElement.textContent = '0 pts';
+      fill.style.width = '0%';
+      progressText.textContent = `01 / ${String(messages.length).padStart(2, '0')}`;
+      progressBar.setAttribute('aria-valuenow', '0');
+      document.getElementById('completion').classList.remove('show');
+      document.getElementById('completion').innerHTML = '';
+      document.getElementById('game-view').hidden = false;
+      loadMessage();
+      reportButton.focus();
+    }
+
+    reportButton.addEventListener('click', () => decide(true));
+    safeButton.addEventListener('click', () => decide(false));
+    loadMessage();
+  </script>
+</body>
+</html>
